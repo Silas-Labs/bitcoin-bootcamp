@@ -1,0 +1,43 @@
+cd ~
+
+wget https://github.com/Kitware/CMake/releases/download/v4.1.1/cmake-4.1.1-linux-aarch64.tar.gz
+
+mkdir -p $HOME/tools
+tar -xzf cmake-*.tar.gz -C $HOME/tools
+
+export PATH=$(find $HOME/tools -type d -name bin | head -1):$PATH
+
+cmake --version
+
+cd ~
+
+wget https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.gz
+
+tar xf boost_1_88_0.tar.gz
+cd boost_1_88_0
+
+./bootstrap.sh --prefix=$HOME/local
+./b2 install
+
+
+export CMAKE_PREFIX_PATH=$HOME/local:$CMAKE_PREFIX_PATH
+
+cmake -B build \
+  -DCMAKE_PREFIX_PATH=$HOME/local
+  
+  cd ~
+
+wget https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
+
+tar xf libevent-2.1.12-stable.tar.gz
+cd libevent-2.1.12-stable
+
+./configure --prefix=$HOME/local
+make -j$(nproc)
+make install
+
+export PKG_CONFIG_PATH=$HOME/local/lib/pkgconfig:$PKG_CONFIG_PATH
+
+pkg-config --modversion libevent_core
+
+cmake -B build -DENABLE_IPC=OFF
